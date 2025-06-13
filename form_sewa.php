@@ -1,10 +1,22 @@
+<?php
+session_start();
+if (!isset($_SESSION['is_login'])) {
+  // Jika tidak login, alihkan ke halaman login
+  header("Location: login.php");
+  exit;
+}
+
+?>
+
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <title>Form Penyewaan</title>
 </head>
+
 <body>
   <div class="container mt-5">
     <div class="card mx-auto" style="max-width: 500px;">
@@ -17,8 +29,8 @@
               <option value="">-- Pilih Alat --</option>
               <?php
               $res = mysqli_query($conn, "SELECT * FROM alat_berat");
-              while($r = mysqli_fetch_assoc($res)) {
-                echo "<option value='{$r['id']}'>{$r['nama_alat']} - Rp".number_format($r['harga_per_hari'],0,',','.')."/hari</option>";
+              while ($r = mysqli_fetch_assoc($res)) {
+                echo "<option value='{$r['id']}'>{$r['nama_alat']} - Rp" . number_format($r['harga_per_hari'], 0, ',', '.') . "/hari</option>";
               }
               ?>
             </select>
@@ -38,4 +50,5 @@
   </div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

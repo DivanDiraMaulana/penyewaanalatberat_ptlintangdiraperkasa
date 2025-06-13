@@ -18,7 +18,7 @@ include 'config/db.php';
   <?php include 'partials/navbar.php'; ?>
 
   <div class="container mt-5 text-center">
-    <h1 class="mb-4">Selamat Datang Di dimana<span class="text-primary">Sewa Alat Berat</span></h1>
+    <h1 class="mb-4">Selamat Datang Di <span class="text-primary">Sewa Alat Berat</span></h1>
     <p class="lead">Kami menyediakan berbagai alat berat terbaik untuk menunjang proyek Anda.</p>
 
     <div class="mt-4">
