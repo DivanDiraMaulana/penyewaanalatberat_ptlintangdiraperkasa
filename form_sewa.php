@@ -18,6 +18,12 @@ if (!isset($_SESSION['is_login'])) {
 </head>
 
 <body>
+
+  <?php
+  include "partials/sidebar.php"
+  ?>
+
+
   <div class="container mt-5">
     <div class="card mx-auto" style="max-width: 500px;">
       <div class="card-header bg-primary text-white">Form Penyewaan</div>
