@@ -17,12 +17,12 @@ include 'config/db.php';
     }
 
     .hero {
-      background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-        url('assets/img/grader.jpg') no-repeat center center;
+      background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)),
+        url('assets/img/owner.png') no-repeat center center;
       background-size: cover;
       color: white;
       padding: 140px 20px;
-      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.9);
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
     }
 
     .section-title {
@@ -71,8 +71,8 @@ include 'config/db.php';
 
   <!-- HERO SECTION -->
   <section class="hero text-center">
-    <div class="container">
-      <h1 class="display-4 fw-bold">PT LINTANGDIRA PERKASA</h1>
+    <div class="container mt-3">
+      <h1 class="display-5 fw-bold">PT LINTANGDIRA PERKASA</h1>
       <p class="lead">Solusi terpercaya untuk sewa alat berat Anda</p>
       <!-- <a href="alat_berat.php" class="btn btn-primary-custom btn-lg me-2">Lihat Alat Berat</a> -->
       <a href="kontak.php" class="btn btn-outline-light btn-lg">Hubungi Kami</a>
@@ -92,7 +92,7 @@ include 'config/db.php';
     <div class="row row-cols-1 row-cols-md-3 g-4">
       <div class="col">
         <div class="card shadow-sm h-100">
-          <img src="assets/img/dump truck.jpg" class="card-img-top" alt="Dump Truck">
+          <img src="assets/img/dump truk.jpg" class="card-img-top" alt="Dump Truck">
           <div class="card-body">
             <h5 class="card-title">Dump Truck Komatsu HD785</h5>
             <p class="card-text">Kapasitas angkut besar untuk keperluan tambang berat.</p>
@@ -101,7 +101,7 @@ include 'config/db.php';
       </div>
       <div class="col">
         <div class="card shadow-sm h-100">
-          <img src="assets/img/exvacator.jpg" class="card-img-top" alt="Excavator">
+          <img src="assets/img/excavator.jpg" class="card-img-top" alt="Excavator">
           <div class="card-body">
             <h5 class="card-title">Excavator CAT 324E</h5>
             <p class="card-text">Efisien untuk penggalian dan pemindahan tanah.</p>
