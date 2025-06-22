@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jun 17, 2025 at 04:58 PM
+-- Generation Time: Jun 22, 2025 at 04:43 PM
 -- Server version: 8.0.30
 -- PHP Version: 8.3.7
 
@@ -32,7 +32,6 @@ CREATE TABLE `alat_berat` (
   `nama_alat` varchar(100) DEFAULT NULL,
   `jenis` varchar(50) DEFAULT NULL,
   `harga_per_hari` int DEFAULT NULL,
-  `deskripsi` text,
   `foto` varchar(255) DEFAULT NULL,
   `status` enum('tersedia','disewa') DEFAULT 'tersedia',
   `id_kategori` int DEFAULT NULL
@@ -42,21 +41,21 @@ CREATE TABLE `alat_berat` (
 -- Dumping data for table `alat_berat`
 --
 
-INSERT INTO `alat_berat` (`id`, `nama_alat`, `jenis`, `harga_per_hari`, `deskripsi`, `foto`, `status`, `id_kategori`) VALUES
-(1, 'Excavator', 'Digger', 3000000, 'Excavator PC100 ini sangat dapat diandalkan', 'excavator.jpg', 'disewa', NULL),
-(2, 'Backhoe Loader', 'Loader', 850000, 'Alat multifungsi untuk penggalian dan pemindahan material.', 'backhoe loader.jpg', 'tersedia', NULL),
-(3, 'Bulldozer', 'Dozer', 950000, 'Digunakan untuk mendorong dan meratakan tanah atau material lainnya.', 'bulldozer.jpg', 'tersedia', NULL),
-(4, 'Crane', 'Lifting', 1500000, 'Digunakan untuk mengangkat dan memindahkan material berat secara vertikal.', 'crane.jpg', 'tersedia', NULL),
-(5, 'Backhoe Loader', 'Loader', 850000, 'Alat multifungsi untuk penggalian dan pemindahan material.', 'backhoe loader.jpg', 'tersedia', NULL),
-(6, 'Bulldozer', 'Dozer', 950000, 'Digunakan untuk mendorong dan meratakan tanah atau material lainnya.', 'bulldozer.jpg', 'tersedia', NULL),
-(7, 'Crane', 'Lifting', 1500000, 'Digunakan untuk mengangkat dan memindahkan material berat secara vertikal.', 'crane.jpg', 'tersedia', NULL),
-(8, 'Dump Truck', 'Transport', 750000, 'Kendaraan untuk mengangkut material seperti pasir, tanah, dan batu.', 'dump truk.jpg', 'tersedia', NULL),
-(9, 'Excavator', 'Penggali', 1200000, 'Digunakan untuk menggali tanah dan memindahkan material besar.', 'excavator.jpg', 'tersedia', NULL),
-(10, 'Grader', 'Perata', 800000, 'Alat untuk meratakan permukaan tanah atau jalan.', 'grader.jpg', 'tersedia', NULL),
-(11, 'Hydraulic Breaker', 'Pemecah', 1300000, 'Dipakai untuk menghancurkan beton, batu besar, atau bangunan.', 'hydraulic breaker.jpg', 'tersedia', NULL),
-(12, 'Skid Steer Loader', 'Loader Kompak', 700000, 'Loader kecil serbaguna untuk area kerja sempit.', 'skid steer loader.jpg', 'tersedia', NULL),
-(13, 'Vibro Roller', 'Pemadat', 900000, 'Digunakan untuk memadatkan tanah atau aspal dengan getaran.', 'vibro roller.jpg', 'tersedia', NULL),
-(14, 'Wheel Loader', 'Loader', 1000000, 'Untuk memuat material ke dalam truk atau alat lainnya.', 'wheel loader.jpg', 'tersedia', NULL);
+INSERT INTO `alat_berat` (`id`, `nama_alat`, `jenis`, `harga_per_hari`, `foto`, `status`, `id_kategori`) VALUES
+(1, 'Excavator', 'Digger', 3000000, 'excavator.jpg', 'tersedia', NULL),
+(2, 'Backhoe Loader', 'Loader', 850000, 'backhoe loader.jpg', 'tersedia', NULL),
+(3, 'Bulldozer', 'Dozer', 950000, 'bulldozer.jpg', 'tersedia', NULL),
+(4, 'Crane', 'Lifting', 1500000, 'crane.jpg', 'tersedia', NULL),
+(5, 'Backhoe Loader', 'Loader', 850000, 'backhoe loader.jpg', 'tersedia', NULL),
+(6, 'Bulldozer', 'Dozer', 950000, 'bulldozer.jpg', 'tersedia', NULL),
+(7, 'Crane', 'Lifting', 1500000, 'crane.jpg', 'tersedia', NULL),
+(8, 'Dump Truck', 'Transport', 750000, 'dump truk.jpg', 'tersedia', NULL),
+(9, 'Excavator', 'Penggali', 1200000, 'excavator.jpg', 'tersedia', NULL),
+(10, 'Grader', 'Perata', 800000, 'grader.jpg', 'tersedia', NULL),
+(11, 'Hydraulic Breaker', 'Pemecah', 1300000, 'hydraulic breaker.jpg', 'tersedia', NULL),
+(12, 'Skid Steer Loader', 'Loader Kompak', 700000, 'skid steer loader.jpg', 'tersedia', NULL),
+(13, 'Vibro Roller', 'Pemadat', 900000, 'vibro roller.jpg', 'tersedia', NULL),
+(14, 'Wheel Loaderio', 'Loaderio', 10000001, 'wheel loader.jpg', 'tersedia', NULL);
 
 -- --------------------------------------------------------
 
@@ -68,6 +67,16 @@ CREATE TABLE `kategori_alat` (
   `id` int NOT NULL,
   `nama_kategori` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `kategori_alat`
+--
+
+INSERT INTO `kategori_alat` (`id`, `nama_kategori`) VALUES
+(1, 'Dozer'),
+(2, 'Digger'),
+(3, 'Lifting'),
+(4, 'Loader');
 
 -- --------------------------------------------------------
 
@@ -98,9 +107,17 @@ CREATE TABLE `transaksi` (
   `tanggal_sewa` date DEFAULT NULL,
   `durasi` int DEFAULT NULL,
   `total_biaya` int DEFAULT NULL,
-  `tanggal_kembali` date DEFAULT NULL,
   `status` enum('menunggu','disetujui','berjalan','selesai','ditolak') DEFAULT 'menunggu'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `transaksi`
+--
+
+INSERT INTO `transaksi` (`id`, `id_user`, `id_alat`, `tanggal_sewa`, `durasi`, `total_biaya`, `status`) VALUES
+(1, 3, 2, '2025-06-10', 2, 1700000, 'selesai'),
+(4, 2, 5, '2025-06-27', 3, 20000, 'selesai'),
+(5, 3, 11, '2025-06-11', 13, 16900000, 'selesai');
 
 -- --------------------------------------------------------
 
@@ -177,7 +194,7 @@ ALTER TABLE `alat_berat`
 -- AUTO_INCREMENT for table `kategori_alat`
 --
 ALTER TABLE `kategori_alat`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `pembayaran`
@@ -189,7 +206,7 @@ ALTER TABLE `pembayaran`
 -- AUTO_INCREMENT for table `transaksi`
 --
 ALTER TABLE `transaksi`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `users`
