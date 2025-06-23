@@ -11,6 +11,7 @@ if (!isset($_SESSION['is_login']) || $_SESSION['role'] != 'admin') {
 $action = $_GET['action'] ?? '';
 
 if ($action == 'add') {
+
     // proses tambah data
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $id_alat = $_POST['id_alat'];
@@ -104,7 +105,7 @@ $result = mysqli_query($conn, $query);
 
     <?php
     include "sidebar_admin.php";
-    $alat_result = mysqli_query($conn, "SELECT id, nama_alat, status FROM alat_berat");
+    $alat_result = mysqli_query($conn, "SELECT id, nama_alat,harga_per_hari, status FROM alat_berat");
 
     // Ambil semua data user
     $user_result = mysqli_query($conn, "SELECT id, nama FROM users WHERE role = 'user'");
@@ -116,10 +117,11 @@ $result = mysqli_query($conn, $query);
             <form method="POST" action="">
                 <div class="mb-3">
                     <label>Nama Alat Berat</label>
-                    <select name="id_alat" class="form-select" required>
+                    <select name="id_alat" id="id_alat" class="form-select" required>
                         <option value="">-- Pilih Alat Berat --</option>
                         <?php while ($alat = mysqli_fetch_assoc($alat_result)): ?>
-                            <option value="<?= $alat['id'] ?>" <?= ($action == 'edit' && $data_edit['id_alat'] == $alat['id']) ? 'selected' : '' ?>>
+                            <option value="<?= $alat['id'] ?>" data-harga="<?= $alat['harga_per_hari'] ?>"
+                                <?= ($action == 'edit' && $data_edit['id_alat'] == $alat['id']) ? 'selected' : '' ?>>
                                 <?= htmlspecialchars($alat['nama_alat']) ?> - <?= $alat['status'] ?>
                             </option>
                         <?php endwhile; ?>
@@ -143,12 +145,12 @@ $result = mysqli_query($conn, $query);
                 </div>
                 <div class="mb-3">
                     <label>Durasi (hari)</label>
-                    <input type="number" name="durasi" class="form-control" required
+                    <input type="number" name="durasi" id="durasi" class="form-control" required
                         value="<?= $action == 'edit' ? $data_edit['durasi'] : '' ?>">
                 </div>
                 <div class="mb-3">
                     <label>Total Biaya</label>
-                    <input type="number" name="total_biaya" class="form-control" required
+                    <input type="number" name="total_biaya" id="total_biaya" class="form-control" readonly
                         value="<?= $action == 'edit' ? $data_edit['total_biaya'] : '' ?>">
                 </div>
                 <div class="mb-3">
@@ -194,7 +196,7 @@ $result = mysqli_query($conn, $query);
                                     <?php
                                     $status = $row['status'];
                                     $badge = 'secondary'; // default
-                        
+
                                     if ($status == 'menunggu') {
                                         $badge = 'warning';
                                     } elseif ($status == 'disetujui') {
@@ -233,6 +235,24 @@ $result = mysqli_query($conn, $query);
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const selectAlat = document.getElementById('id_alat');
+        const durasiInput = document.getElementById('durasi');
+        const totalBiayaInput = document.getElementById('total_biaya');
+
+        function hitungTotal() {
+            const harga = selectAlat.selectedOptions[0]?.getAttribute('data-harga') || 0;
+            const durasi = durasiInput.value || 0;
+            const total = parseInt(harga) * parseInt(durasi);
+            totalBiayaInput.value = total;
+        }
+
+        selectAlat.addEventListener('change', hitungTotal);
+        durasiInput.addEventListener('input', hitungTotal);
+
+        // Jika mau langsung dihitung saat halaman edit dimuat:
+        hitungTotal();
+    </script>
 </body>
 
 </html>

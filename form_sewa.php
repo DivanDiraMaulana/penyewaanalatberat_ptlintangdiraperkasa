@@ -56,7 +56,7 @@ include 'config/db.php';
               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
           <?php endif; ?>
-          <form method="post" action="proses_sewa.php">
+          <form method="post" action="controller/proses_sewa.php">
 
             <!-- id -->
             <div class="mb-3">
@@ -78,12 +78,16 @@ include 'config/db.php';
                 <?php
                 $res = mysqli_query($conn, "SELECT * FROM alat_berat WHERE status = 'tersedia'");
                 while ($r = mysqli_fetch_assoc($res)) {
-                  echo "<option value='{$r['id']}'>" . htmlspecialchars($r['nama_alat']) .
-                    " - Rp" . number_format($r['harga_per_hari'], 0, ',', '.') . "/hari</option>";
+                ?>
+                  <option value="<?= $r['id']; ?>" data-harga="<?= $r['harga_per_hari']; ?>">
+                    <?= htmlspecialchars($r['nama_alat']); ?> - Rp<?= number_format($r['harga_per_hari'], 0, ',', '.'); ?>/hari
+                  </option>
+                <?php
                 }
                 ?>
               </select>
             </div>
+
 
             <!-- Tanggal Mulai Sewa -->
             <div class="mb-3">
@@ -95,6 +99,11 @@ include 'config/db.php';
             <div class="mb-3">
               <label for="durasi" class="form-label">Durasi (hari)</label>
               <input type="number" class="form-control" id="durasi" name="durasi" min="1" required>
+            </div>
+            <!-- total -->
+            <div class="mb-3">
+              <label for="total" class="form-label">Total (Rp)</label>
+              <input type="text" class="form-control" id="total" name="total" readonly>
             </div>
 
             <!-- Tombol Submit -->
@@ -111,6 +120,22 @@ include 'config/db.php';
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const selectAlat = document.getElementById('alat');
+    const inputDurasi = document.getElementById('durasi');
+    const inputTotal = document.getElementById('total');
+
+    function hitungTotal() {
+      const selected = selectAlat.options[selectAlat.selectedIndex];
+      const harga = selected ? parseFloat(selected.dataset.harga || 0) : 0;
+      const durasi = parseInt(inputDurasi.value) || 0;
+      inputTotal.value = (harga * durasi).toLocaleString('id-ID'); // format Indonesia
+    }
+
+    selectAlat.addEventListener('change', hitungTotal);
+    inputDurasi.addEventListener('input', hitungTotal);
+  </script>
+
 </body>
 
 </html>

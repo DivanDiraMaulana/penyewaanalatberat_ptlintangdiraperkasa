@@ -76,9 +76,9 @@ $result = mysqli_query($conn, $query);
 
     <div class="d-flex">
         <!-- Sidebar -->
-        <div class="sidebar no-print">
-            <?php include "sidebar_admin.php"; ?>
-        </div>
+
+        <?php include "sidebar_admin.php"; ?>
+
 
         <!-- Konten Utama -->
         <div class="main-content">

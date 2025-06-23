@@ -11,58 +11,104 @@ include 'config/db.php';
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
-      background-color: #f0f2f5;
-      color: #333;
+      background-color: #f7f9fc;
+      color: #2c3e50;
       font-family: 'Segoe UI', sans-serif;
     }
 
+    /* HERO SECTION */
     .hero {
-      background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)),
+      background: linear-gradient(rgba(44, 62, 80, 0.1),
+          rgba(44, 62, 80, 0.1)),
         url('assets/img/owner.png') no-repeat center center;
       background-size: cover;
       color: white;
       padding: 140px 20px;
-      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
     }
 
+    .hero h1 {
+      font-size: 2.8rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      margin-top: 0.5rem;
+    }
+
+    /* BUTTON PRIMARY */
+    .btn-primary-custom {
+      background-color: #f1c40f;
+      border-color: #f1c40f;
+      color: #2c3e50;
+      font-weight: 600;
+      border-radius: 30px;
+      padding: 0.5rem 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary-custom:hover {
+      background-color: #d4ac0d;
+      border-color: #d4ac0d;
+    }
+
+    /* SECTION TITLES */
     .section-title {
       font-weight: bold;
-      margin-bottom: 30px;
-      color: #222;
+      color: #2c3e50;
+      position: relative;
+      padding-bottom: 0.5rem;
+    }
+
+    .section-title::after {
+      content: '';
+      width: 80px;
+      height: 3px;
+      background: #f1c40f;
+      display: block;
+      margin: 0.5rem auto;
+    }
+
+    /* CARD STYLES */
+    .card {
+      border: none;
+      border-radius: 1rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
     }
 
     .card-img-top {
-      height: 240px;
+      border-top-left-radius: 1rem;
+      border-top-right-radius: 1rem;
+      height: 220px;
       object-fit: cover;
     }
 
     .why-card {
-      transition: transform 0.3s ease;
+      background-color: white;
+      padding: 1rem;
     }
 
-    .why-card:hover {
-      transform: scale(1.03);
-    }
-
+    /* FOOTER */
     footer {
-      background-color: #222;
-      color: #ddd;
-      padding: 20px 0;
+      background-color: #2c3e50;
+      color: #ccc;
+      padding: 1.5rem 0;
       text-align: center;
-      margin-top: 60px;
     }
 
-    .btn-primary-custom {
-      background-color: #f5b041;
-      border-color: #f5b041;
-      color: #000;
-    }
-
-    .btn-outline-light:hover {
-      background-color: #fff;
-      color: #000;
+    footer p {
+      margin: 0;
+      font-size: 0.9rem;
     }
   </style>
+
 </head>
 
 <body>
@@ -74,7 +120,6 @@ include 'config/db.php';
     <div class="container mt-3">
       <h1 class="display-5 fw-bold">PT LINTANGDIRA PERKASA</h1>
       <p class="lead">Solusi terpercaya untuk sewa alat berat Anda</p>
-      <!-- <a href="alat_berat.php" class="btn btn-primary-custom btn-lg me-2">Lihat Alat Berat</a> -->
       <a href="hubungi_kami.php" class="btn btn-outline-light btn-lg">Hubungi Kami</a>
     </div>
   </section>

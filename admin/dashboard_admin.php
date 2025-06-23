@@ -193,7 +193,9 @@ $total_user = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total_u
             options: {
                 responsive: true,
                 scales: {
-                    y: { beginAtZero: true }
+                    y: {
+                        beginAtZero: true
+                    }
                 }
             }
         });

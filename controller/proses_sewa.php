@@ -5,7 +5,7 @@ if (!isset($_SESSION['is_login'])) {
   exit;
 }
 
-include 'config/db.php';
+include '../config/db.php';
 
 // Ambil data dari form
 $id_user = $_SESSION['user_id'];
@@ -15,7 +15,7 @@ $durasi = (int) $_POST['durasi'];
 
 // Validasi awal
 if (!$id_alat || !$tanggal_sewa || $durasi < 1) {
-  header("Location: form_sewa.php?status=gagal");
+  header("Location: ../form_sewa.php?status=gagal");
   exit;
 }
 
@@ -26,10 +26,10 @@ $q = mysqli_query($conn, "SELECT harga_per_hari FROM alat_berat WHERE id = '$id_
 $data = mysqli_fetch_assoc($q);
 
 if (!$data) {
-  header("Location: form_sewa.php?status=gagal");
+  header("Location: ../form_sewa.php?status=gagal");
   exit;
 }
-
+//kalkulasi harga x durasi
 $harga_per_hari = (int) $data['harga_per_hari'];
 $total_biaya = $durasi * $harga_per_hari;
 
@@ -44,7 +44,7 @@ if (mysqli_query($conn, $sql)) {
   $sqlab = "UPDATE alat_berat SET status='disewa' WHERE id='$id_alat'";
   mysqli_query($conn, $sqlab);
 
-  header("Location: form_sewa.php?status=sukses");
+  header("Location: ../form_sewa.php?status=sukses");
 } else {
-  header("Location: form_sewa.php?status=gagal");
+  header("Location: ../form_sewa.php?status=gagal");
 }
