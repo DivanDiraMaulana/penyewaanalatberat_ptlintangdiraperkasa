@@ -92,7 +92,7 @@ include 'config/db.php';
     <div class="row row-cols-1 row-cols-md-3 g-4">
       <div class="col">
         <div class="card shadow-sm h-100">
-          <img src="assets/img/dump truck.jpg" class="card-img-top" alt="Dump Truck">
+          <img src="assets/img/dump truk.jpg" class="card-img-top" alt="Dump Truck">
           <div class="card-body">
             <h5 class="card-title">Dump Truck Komatsu HD785</h5>
             <p class="card-text">Kapasitas angkut besar untuk keperluan tambang berat.</p>
@@ -101,7 +101,7 @@ include 'config/db.php';
       </div>
       <div class="col">
         <div class="card shadow-sm h-100">
-          <img src="assets/img/exvacator.jpg" class="card-img-top" alt="Excavator">
+          <img src="assets/img/excavator.jpg" class="card-img-top" alt="Excavator">
           <div class="card-body">
             <h5 class="card-title">Excavator CAT 324E</h5>
             <p class="card-text">Efisien untuk penggalian dan pemindahan tanah.</p>
