@@ -2,19 +2,26 @@
 session_start();
 include "config/db.php";
 
-// Cek apakah user sudah login
 if (!isset($_SESSION['user_id'])) {
   header("Location: login.php");
   exit;
 }
 
 $id_user = $_SESSION['user_id'];
+$start_date = $_GET['start_date'] ?? '';
+$end_date = $_GET['end_date'] ?? '';
+
 $query = "SELECT t.*, a.nama_alat 
           FROM transaksi t 
           JOIN alat_berat a ON t.id_alat = a.id 
           WHERE t.id_user = '$id_user' 
-          AND t.status = 'selesai'
-          ORDER BY t.id DESC";
+          AND t.status = 'selesai'";
+
+if (!empty($start_date) && !empty($end_date)) {
+  $query .= " AND DATE(t.tanggal_sewa) BETWEEN '$start_date' AND '$end_date'";
+}
+
+$query .= " ORDER BY t.id DESC";
 $result = mysqli_query($conn, $query);
 ?>
 
@@ -28,20 +35,86 @@ $result = mysqli_query($conn, $query);
   <style>
     .content {
       margin-left: 250px;
-      /* Menyesuaikan lebar sidebar */
       padding: 20px;
       background-color: #f8f9fa;
       min-height: 100vh;
+    }
+
+    @media print {
+
+      .no-print,
+      .sidebar {
+        display: none !important;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      .content {
+        margin: 0;
+        padding: 0;
+      }
+
+      table {
+        font-size: 12px;
+      }
+
+      th,
+      td {
+        padding: 5px !important;
+      }
+
+      .print-range-date {
+        display: block !important;
+        margin-bottom: 1rem;
+      }
+    }
+
+    /* Sembunyikan rentang tanggal saat tidak print */
+    .print-range-date {
+      display: none;
     }
   </style>
 </head>
 
 <body>
-  <?php
-  include "partials/sidebar.php"
-  ?>
+
+  <div class="sidebar no-print">
+    <?php include "partials/sidebar.php" ?>
+  </div>
+
   <div class="content mt-5">
     <h2 class="mb-4">Riwayat Transaksi Penyewaan Anda</h2>
+
+    <!-- TAMPILKAN RENTANG TANGGAL SAAT PRINT -->
+    <?php if (!empty($start_date) && !empty($end_date)): ?>
+      <div class="print-range-date">
+        <p class="fw-bold" style="font-size: 16px;">
+          Transaksi dari tanggal <?= date('d-m-Y', strtotime($start_date)) ?>
+          sampai <?= date('d-m-Y', strtotime($end_date)) ?>
+        </p>
+      </div>
+    <?php endif; ?>
+
+    <!-- FORM FILTER & PRINT (hanya muncul di layar) -->
+    <form class="row row-cols-lg-auto g-3 align-items-end mb-4 no-print" method="GET">
+      <div class="col-12">
+        <label for="start_date" class="form-label">Dari Tanggal</label>
+        <input type="date" class="form-control" id="start_date" name="start_date"
+          value="<?= htmlspecialchars($start_date) ?>">
+      </div>
+      <div class="col-12">
+        <label for="end_date" class="form-label">Sampai Tanggal</label>
+        <input type="date" class="form-control" id="end_date" name="end_date"
+          value="<?= htmlspecialchars($end_date) ?>">
+      </div>
+      <div class="col-12">
+        <button type="submit" class="btn btn-primary">Filter</button>
+        <button type="button" class="btn btn-success" onclick="window.print()">Print</button>
+      </div>
+    </form>
 
     <div class="card shadow-sm">
       <div class="card-body">
@@ -55,7 +128,6 @@ $result = mysqli_query($conn, $query);
                 <th>Durasi (hari)</th>
                 <th>Total Biaya</th>
                 <th>Status</th>
-                <th>Aksi</th>
               </tr>
             </thead>
             <tbody>
@@ -65,31 +137,33 @@ $result = mysqli_query($conn, $query);
                   <tr>
                     <td class="text-center"><?= $no++ ?></td>
                     <td><?= htmlspecialchars($row['nama_alat']) ?></td>
-                    <td><?= htmlspecialchars($row['tanggal_sewa']) ?></td>
+                    <td><?= date('d-m-Y', strtotime($row['tanggal_sewa'])) ?></td>
                     <td class="text-center"><?= $row['durasi'] ?></td>
                     <td>Rp<?= number_format($row['total_biaya'], 0, ',', '.') ?></td>
                     <td class="text-center">
                       <?php
                       $status = $row['status'];
-                      $badge = 'secondary';
-                      if ($status == 'menunggu') $badge = 'warning';
-                      elseif ($status == 'disetujui') $badge = 'success';
-                      elseif ($status == 'ditolak') $badge = 'danger';
+                      $badge = 'secondary'; // default
+                  
+                      if ($status == 'menunggu') {
+                        $badge = 'warning';
+                      } elseif ($status == 'disetujui') {
+                        $badge = 'info';
+                      } elseif ($status == 'berjalan') {
+                        $badge = 'primary';
+                      } elseif ($status == 'selesai') {
+                        $badge = 'success';
+                      } elseif ($status == 'ditolak') {
+                        $badge = 'danger';
+                      }
                       ?>
                       <span class="badge bg-<?= $badge ?>"><?= ucfirst($status) ?></span>
-                    </td>
-                    <td class="text-center">
-                      <?php if ($status == 'disetujui'): ?>
-                        <a href="bayar.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-primary">Bayar</a>
-                      <?php else: ?>
-                        <span class="text-muted">-</span>
-                      <?php endif; ?>
                     </td>
                   </tr>
                 <?php endwhile; ?>
               <?php else: ?>
                 <tr>
-                  <td colspan="7" class="text-center text-muted">Belum ada transaksi penyewaan.</td>
+                  <td colspan="6" class="text-center text-muted">Tidak ada transaksi pada rentang tanggal ini.</td>
                 </tr>
               <?php endif; ?>
             </tbody>

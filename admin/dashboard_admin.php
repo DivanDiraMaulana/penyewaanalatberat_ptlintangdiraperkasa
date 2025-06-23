@@ -4,6 +4,32 @@ if (!isset($_SESSION['is_login']) || $_SESSION['role'] !== 'admin') {
     header("Location: ../login.php");
     exit;
 }
+include "../config/db.php";
+
+// Ambil data transaksi per bulan
+$bulan = [];
+$jumlah_transaksi = [];
+
+for ($i = 1; $i <= 6; $i++) {
+    $query = mysqli_query($conn, "SELECT COUNT(*) as total FROM transaksi WHERE MONTH(tanggal_sewa) = $i");
+    $data = mysqli_fetch_assoc($query);
+    $bulan[] = date('M', mktime(0, 0, 0, $i, 1));
+    $jumlah_transaksi[] = $data['total'];
+}
+
+// Ambil data jenis alat berat
+$jenis_labels = [];
+$jenis_values = [];
+$query_jenis = mysqli_query($conn, "SELECT jenis, COUNT(*) as jumlah FROM alat_berat GROUP BY jenis");
+while ($row = mysqli_fetch_assoc($query_jenis)) {
+    $jenis_labels[] = $row['jenis'];
+    $jenis_values[] = $row['jumlah'];
+}
+
+// Hitung total untuk kartu dashboard
+$total_alat = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total_alat FROM alat_berat"))['total_alat'];
+$total_transaksi = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total_transaksi FROM transaksi"))['total_transaksi'];
+$total_user = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total_user FROM users"))['total_user'];
 ?>
 
 <!DOCTYPE html>
@@ -15,6 +41,7 @@ if (!isset($_SESSION['is_login']) || $_SESSION['role'] !== 'admin') {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
             display: flex;
@@ -73,17 +100,17 @@ if (!isset($_SESSION['is_login']) || $_SESSION['role'] !== 'admin') {
             font-weight: bold;
             font-size: 18px;
         }
+
+        canvas {
+            max-height: 300px !important;
+        }
     </style>
 </head>
 
 <body>
 
-    <!-- Sidebar -->
-    <?php
-    include "sidebar_admin.php";
-    ?>
+    <?php include "sidebar_admin.php"; ?>
 
-    <!-- Main Content -->
     <div class="content">
         <div class="topbar">
             Selamat datang, Admin <?php echo $_SESSION['nama']; ?>!
@@ -99,7 +126,7 @@ if (!isset($_SESSION['is_login']) || $_SESSION['role'] !== 'admin') {
                 <div class="card card-custom text-primary">
                     <div class="card-body">
                         <h5 class="card-title"><i class="bi bi-truck me-2"></i>Total Alat Berat</h5>
-                        <p class="card-text fs-4">12 Unit</p>
+                        <p class="card-text fs-4"><?= $total_alat ?> Unit</p>
                     </div>
                 </div>
             </div>
@@ -107,7 +134,7 @@ if (!isset($_SESSION['is_login']) || $_SESSION['role'] !== 'admin') {
                 <div class="card card-custom text-success">
                     <div class="card-body">
                         <h5 class="card-title"><i class="bi bi-list-check me-2"></i>Total Transaksi</h5>
-                        <p class="card-text fs-4">24 Sewa</p>
+                        <p class="card-text fs-4"><?= $total_transaksi ?> Sewa</p>
                     </div>
                 </div>
             </div>
@@ -115,14 +142,79 @@ if (!isset($_SESSION['is_login']) || $_SESSION['role'] !== 'admin') {
                 <div class="card card-custom text-warning">
                     <div class="card-body">
                         <h5 class="card-title"><i class="bi bi-people me-2"></i>Total Pengguna</h5>
-                        <p class="card-text fs-4">8 User</p>
+                        <p class="card-text fs-4"><?= $total_user ?> User</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="row mt-5">
+            <div class="col-md-6">
+                <div class="card card-custom">
+                    <div class="card-body">
+                        <h5 class="card-title">Grafik Transaksi per Bulan</h5>
+                        <canvas id="lineChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card card-custom">
+                    <div class="card-body">
+                        <h5 class="card-title">Distribusi Jenis Alat Berat</h5>
+                        <canvas id="pieChart"></canvas>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Scripts -->
+    <!-- Chart.js Script -->
+    <script>
+        const bulan = <?= json_encode($bulan) ?>;
+        const jumlah = <?= json_encode($jumlah_transaksi) ?>;
+        const jenis = <?= json_encode($jenis_labels) ?>;
+        const jumlahJenis = <?= json_encode($jenis_values) ?>;
+
+        // Line Chart
+        new Chart(document.getElementById('lineChart'), {
+            type: 'line',
+            data: {
+                labels: bulan,
+                datasets: [{
+                    label: 'Transaksi',
+                    data: jumlah,
+                    borderColor: 'rgba(13, 110, 253, 1)',
+                    backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        // Pie Chart
+        new Chart(document.getElementById('pieChart'), {
+            type: 'pie',
+            data: {
+                labels: jenis,
+                datasets: [{
+                    data: jumlahJenis,
+                    backgroundColor: ['#0d6efd', '#198754', '#ffc107', '#dc3545', '#6f42c1'],
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    </script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

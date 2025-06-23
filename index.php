@@ -75,14 +75,25 @@ include 'config/db.php';
       <h1 class="display-5 fw-bold">PT LINTANGDIRA PERKASA</h1>
       <p class="lead">Solusi terpercaya untuk sewa alat berat Anda</p>
       <!-- <a href="alat_berat.php" class="btn btn-primary-custom btn-lg me-2">Lihat Alat Berat</a> -->
-      <a href="kontak.php" class="btn btn-outline-light btn-lg">Hubungi Kami</a>
+      <a href="hubungi_kami.php" class="btn btn-outline-light btn-lg">Hubungi Kami</a>
     </div>
   </section>
 
   <!-- ABOUT US SECTION -->
   <section class="container text-center my-5">
     <h2 class="section-title">Tentang Kami</h2>
-    <p class="mb-4">Kami menyediakan layanan sewa alat berat terbaik untuk menunjang kebutuhan proyek Anda, dari pertambangan hingga konstruksi besar.</p>
+    <p class="mb-2">Kami Adalah mahasiswa Universitas Pamulang</p>
+    <p><B>MUHAMMAD LINTANG FAHREZA 211011400975</B></p>
+    <P><B>DIVAN DIRA MAULANA 211011401032</B></P>
+    <p class="mb-4">
+      Kami menyediakan layanan sewa alat berat terbaik untuk menunjang berbagai kebutuhan proyek Anda, mulai dari
+      pertambangan, konstruksi bangunan, hingga pengembangan infrastruktur berskala besar. Dengan dukungan armada alat
+      berat yang lengkap, perawatan berkala, serta operator berpengalaman, kami berkomitmen memberikan solusi efisien
+      dan terpercaya demi kelancaran proyek Anda. Website ini dikembangkan sebagai bagian dari tugas akhir Mata Kuliah
+      Pemrograman 2, dengan tujuan mengimplementasikan konsep CRUD, autentikasi, dashboard admin, serta integrasi basis
+      data dalam satu aplikasi berbasis web yang responsif dan fungsional.
+    </p>
+
   </section>
 
   <!-- SHOWCASE SECTION -->

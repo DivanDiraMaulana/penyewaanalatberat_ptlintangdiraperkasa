@@ -40,7 +40,7 @@
 <div class="sidebar">
     <h4>Admin Panel</h4>
     <a href="dashboard_admin.php"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
-    <a href="transaksi.php"><i class="bi bi-truck me-2"></i> Transaksi</a>
+    <a href="transaksi.php"><i class="bi bi-cash-coin"></i></i> Transaksi</a>
     <a href="alat_berat.php"><i class="bi bi-truck me-2"></i> Alatberat</a>
     <a href="data_user.php"><i class="bi bi-people me-2"></i> Data Pengguna</a>
     <a href="riwayat_sewa.php"><i class="bi bi-clock-history me-2"></i> Riwayat Sewa</a>

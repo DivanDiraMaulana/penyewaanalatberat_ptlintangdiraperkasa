@@ -35,7 +35,7 @@ CREATE TABLE `alat_berat` (
   `foto` varchar(255) DEFAULT NULL,
   `status` enum('tersedia','disewa') DEFAULT 'tersedia',
   `id_kategori` int DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `alat_berat`
@@ -66,7 +66,7 @@ INSERT INTO `alat_berat` (`id`, `nama_alat`, `jenis`, `harga_per_hari`, `foto`, 
 CREATE TABLE `kategori_alat` (
   `id` int NOT NULL,
   `nama_kategori` varchar(100) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `kategori_alat`
@@ -92,7 +92,7 @@ CREATE TABLE `pembayaran` (
   `metode` varchar(50) DEFAULT NULL,
   `bukti_transfer` varchar(255) DEFAULT NULL,
   `status` enum('menunggu_verifikasi','terverifikasi','ditolak') DEFAULT 'menunggu_verifikasi'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -108,7 +108,7 @@ CREATE TABLE `transaksi` (
   `durasi` int DEFAULT NULL,
   `total_biaya` int DEFAULT NULL,
   `status` enum('menunggu','disetujui','berjalan','selesai','ditolak') DEFAULT 'menunggu'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `transaksi`
@@ -131,7 +131,7 @@ CREATE TABLE `users` (
   `email` varchar(100) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL,
   `role` enum('admin','user') DEFAULT 'user'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`

@@ -16,8 +16,15 @@ if ($action == 'add' && $_SERVER['REQUEST_METHOD'] == 'POST') {
     $jenis = $_POST['jenis'];
     $harga_per_hari = $_POST['harga_per_hari'];
     $status = $_POST['status'];
-    $query = "INSERT INTO alat_berat (nama_alat, jenis, harga_per_hari, status)
-              VALUES ('$nama_alat', '$jenis', '$harga_per_hari', '$status')";
+
+    // Proses upload foto
+    $foto = $_FILES['foto']['name'];
+    $tmp = $_FILES['foto']['tmp_name'];
+    $path = "../assets/img/" . $foto;
+    move_uploaded_file($tmp, $path);
+
+    $query = "INSERT INTO alat_berat (nama_alat, jenis, harga_per_hari, status, foto)
+                VALUES ('$nama_alat', '$jenis', '$harga_per_hari', '$status', '$foto')";
     mysqli_query($conn, $query);
     header("Location: alat_berat.php");
     exit;
@@ -31,7 +38,17 @@ if ($action == 'edit' && isset($_GET['id'])) {
         $jenis = $_POST['jenis'];
         $harga_per_hari = $_POST['harga_per_hari'];
         $status = $_POST['status'];
-        $query = "UPDATE alat_berat SET nama_alat='$nama_alat', jenis='$jenis', harga_per_hari='$harga_per_hari', status='$status' WHERE id='$id'";
+
+        $foto = $_FILES['foto']['name'];
+        if ($foto != '') {
+            $tmp = $_FILES['foto']['tmp_name'];
+            $path = "../assets/img/" . $foto;
+            move_uploaded_file($tmp, $path);
+            $query = "UPDATE alat_berat SET nama_alat='$nama_alat', jenis='$jenis', harga_per_hari='$harga_per_hari', status='$status', foto='$foto' WHERE id='$id'";
+        } else {
+            $query = "UPDATE alat_berat SET nama_alat='$nama_alat', jenis='$jenis', harga_per_hari='$harga_per_hari', status='$status' WHERE id='$id'";
+        }
+
         mysqli_query($conn, $query);
         header("Location: alat_berat.php");
         exit;
@@ -69,24 +86,32 @@ $data = mysqli_query($conn, "SELECT * FROM alat_berat ORDER BY id DESC");
         <!-- Form tambah/edit -->
         <?php if ($action == 'add' || ($action == 'edit' && isset($data_edit))): ?>
             <h5><?= $action == 'add' ? 'Tambah Alat Berat' : 'Edit Alat Berat' ?></h5>
-            <form method="POST" action="">
+            <form method="POST" action="" enctype="multipart/form-data">
                 <div class="mb-3">
                     <label>Nama Alat</label>
-                    <input type="text" name="nama_alat" class="form-control" required value="<?= $action == 'edit' ? $data_edit['nama_alat'] : '' ?>">
+                    <input type="text" name="nama_alat" class="form-control" required
+                        value="<?= $action == 'edit' ? $data_edit['nama_alat'] : '' ?>">
                 </div>
                 <div class="mb-3">
                     <label>Jenis</label>
-                    <input type="text" name="jenis" class="form-control" required value="<?= $action == 'edit' ? $data_edit['jenis'] : '' ?>">
+                    <input type="text" name="jenis" class="form-control" required
+                        value="<?= $action == 'edit' ? $data_edit['jenis'] : '' ?>">
                 </div>
                 <div class="mb-3">
                     <label>Harga Sewa (per hari)</label>
-                    <input type="number" name="harga_per_hari" class="form-control" required value="<?= $action == 'edit' ? $data_edit['harga_per_hari'] : '' ?>">
+                    <input type="number" name="harga_per_hari" class="form-control" required
+                        value="<?= $action == 'edit' ? $data_edit['harga_per_hari'] : '' ?>">
+                </div>
+                <div class="mb-3">
+                    <label>Foto Alat</label>
+                    <input type="file" name="foto" class="form-control" <?= $action == 'add' ? 'required' : '' ?>>
                 </div>
                 <div class="mb-3">
                     <label>Status</label>
                     <select name="status" class="form-select" required>
                         <option value="tersedia" <?= ($action == 'edit' && $data_edit['status'] == 'tersedia') ? 'selected' : '' ?>>Tersedia</option>
-                        <option value="disewa" <?= ($action == 'edit' && $data_edit['status'] == 'disewa') ? 'selected' : '' ?>>Disewa</option>
+                        <option value="disewa" <?= ($action == 'edit' && $data_edit['status'] == 'disewa') ? 'selected' : '' ?>>
+                            Disewa</option>
                     </select>
                 </div>
                 <button type="submit" class="btn btn-primary"><?= $action == 'add' ? 'Tambah' : 'Update' ?></button>
@@ -100,6 +125,7 @@ $data = mysqli_query($conn, "SELECT * FROM alat_berat ORDER BY id DESC");
                 <thead>
                     <tr>
                         <th>No</th>
+                        <th>Gambar</th>
                         <th>Nama Alat</th>
                         <th>Jenis</th>
                         <th>Harga Sewa (per hari)</th>
@@ -113,13 +139,24 @@ $data = mysqli_query($conn, "SELECT * FROM alat_berat ORDER BY id DESC");
                         while ($row = mysqli_fetch_assoc($data)): ?>
                             <tr>
                                 <td><?= $no++ ?></td>
+                                <td>
+                                    <?php if ($row['foto']): ?>
+                                        <img src="../assets/img/<?= htmlspecialchars($row['foto']) ?>" alt="Foto Alat" width="80">
+                                    <?php else: ?>
+                                        <span class="text-muted">-</span>
+                                    <?php endif; ?>
+                                </td>
                                 <td><?= htmlspecialchars($row['nama_alat']) ?></td>
                                 <td><?= htmlspecialchars($row['jenis']) ?></td>
                                 <td>Rp <?= number_format($row['harga_per_hari'], 0, ',', '.') ?></td>
-                                <td><span class="badge bg-<?= $row['status'] == 'tersedia' ? 'success' : 'danger' ?>"><?= ucfirst($row['status']) ?></span></td>
+                                <td><span
+                                        class="badge bg-<?= $row['status'] == 'tersedia' ? 'success' : 'danger' ?>"><?= ucfirst($row['status']) ?></span>
+                                </td>
                                 <td>
-                                    <a href="alat_berat.php?action=edit&id=<?= $row['id'] ?>" class="btn btn-warning btn-sm">Edit</a>
-                                    <a href="alat_berat.php?action=delete&id=<?= $row['id'] ?>" onclick="return confirm('Hapus alat ini?')" class="btn btn-danger btn-sm">Hapus</a>
+                                    <a href="alat_berat.php?action=edit&id=<?= $row['id'] ?>"
+                                        class="btn btn-warning btn-sm">Edit</a>
+                                    <a href="alat_berat.php?action=delete&id=<?= $row['id'] ?>"
+                                        onclick="return confirm('Hapus alat ini?')" class="btn btn-danger btn-sm">Hapus</a>
                                 </td>
                             </tr>
                         <?php endwhile; ?>

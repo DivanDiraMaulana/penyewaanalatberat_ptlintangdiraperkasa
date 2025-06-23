@@ -30,7 +30,7 @@ if (!isset($_SESSION['is_login'])) {
 
     <?php
     include "partials/sidebar.php"
-    ?>
+        ?>
 
     <!-- Main Content -->
     <div class="content mt-5">
@@ -40,18 +40,18 @@ if (!isset($_SESSION['is_login'])) {
             $id_user = $_SESSION['user_id'];
 
             $query = "SELECT t.*, a.nama_alat 
-          FROM transaksi t 
-          JOIN alat_berat a ON t.id_alat = a.id 
-          WHERE t.id_user = '$id_user' 
-          ORDER BY t.id DESC";
-
+            FROM transaksi t 
+            JOIN alat_berat a ON t.id_alat = a.id 
+            WHERE t.id_user = '$id_user' AND t.status != 'selesai'
+            ORDER BY t.id DESC";
             $result = mysqli_query($conn, $query);
             ?>
 
             <h2 class="mb-4">Dashboard User</h2>
             <div class="alert alert-primary">
                 Selamat datang, <strong><?php echo htmlspecialchars($_SESSION['nama']); ?></strong>!<br>
-                Anda login sebagai <strong>User</strong> di sistem penyewaan alat berat <strong>PT. Lintang Dira Perkasa</strong>.
+                Anda login sebagai <strong>User</strong> di sistem penyewaan alat berat <strong>PT. Lintang Dira
+                    Perkasa</strong>.
             </div>
 
             <div class="row g-4">
@@ -108,16 +108,25 @@ if (!isset($_SESSION['is_login'])) {
                                     <tr>
                                         <td><?= $no++ ?></td>
                                         <td><?= htmlspecialchars($row['nama_alat']) ?></td>
-                                        <td><?= htmlspecialchars($row['tanggal_sewa']) ?></td>
+                                        <td><?= date('d-m-Y', strtotime($row['tanggal_sewa'])) ?></td>
                                         <td><?= $row['durasi'] ?></td>
                                         <td>Rp<?= number_format($row['total_biaya'], 0, ',', '.') ?></td>
                                         <td>
                                             <?php
                                             $status = $row['status'];
-                                            $badge = 'secondary';
-                                            if ($status == 'menunggu') $badge = 'warning';
-                                            elseif ($status == 'disetujui') $badge = 'success';
-                                            elseif ($status == 'ditolak') $badge = 'danger';
+                                            $badge = 'secondary'; // default
+                                    
+                                            if ($status == 'menunggu') {
+                                                $badge = 'warning';
+                                            } elseif ($status == 'disetujui') {
+                                                $badge = 'info';
+                                            } elseif ($status == 'berjalan') {
+                                                $badge = 'primary';
+                                            } elseif ($status == 'selesai') {
+                                                $badge = 'success';
+                                            } elseif ($status == 'ditolak') {
+                                                $badge = 'danger';
+                                            }
                                             ?>
                                             <span class="badge bg-<?= $badge ?>"><?= ucfirst($status) ?></span>
                                         </td>

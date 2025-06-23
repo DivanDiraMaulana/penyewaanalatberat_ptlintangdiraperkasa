@@ -23,6 +23,10 @@ if ($action == 'add') {
         $query = "INSERT INTO transaksi (id_alat, id_user, tanggal_sewa, durasi, total_biaya, status)
                   VALUES ('$id_alat', '$id_user', '$tanggal_sewa', '$durasi', '$total_biaya', '$status')";
         mysqli_query($conn, $query);
+
+        //mengubah status alat menjadi disewa
+        $sqlab = "UPDATE alat_berat SET status='disewa' WHERE id='$id_alat'";
+        mysqli_query($conn, $sqlab);
         header("Location: transaksi.php");
         exit;
     }
@@ -82,7 +86,7 @@ if ($action == 'add') {
 $query = "SELECT t.*, a.nama_alat, u.nama AS nama_user 
           FROM transaksi t 
           JOIN alat_berat a ON t.id_alat = a.id 
-          JOIN users u ON t.id_user = u.id 
+          JOIN users u ON t.id_user = u.id AND t.status != 'selesai'
           ORDER BY t.id DESC";
 $result = mysqli_query($conn, $query);
 ?>
@@ -100,6 +104,10 @@ $result = mysqli_query($conn, $query);
 
     <?php
     include "sidebar_admin.php";
+    $alat_result = mysqli_query($conn, "SELECT id, nama_alat, status FROM alat_berat");
+
+    // Ambil semua data user
+    $user_result = mysqli_query($conn, "SELECT id, nama FROM users WHERE role = 'user'");
     ?>
     <div class="container mt-4">
         <h3>Data Transaksi</h3>
@@ -107,24 +115,41 @@ $result = mysqli_query($conn, $query);
             <h5><?= $action == 'add' ? 'Tambah Transaksi' : 'Edit Transaksi' ?></h5>
             <form method="POST" action="">
                 <div class="mb-3">
-                    <label>ID Alat Berat</label>
-                    <input type="number" name="id_alat" class="form-control" required value="<?= $action == 'edit' ? $data_edit['id_alat'] : '' ?>">
+                    <label>Nama Alat Berat</label>
+                    <select name="id_alat" class="form-select" required>
+                        <option value="">-- Pilih Alat Berat --</option>
+                        <?php while ($alat = mysqli_fetch_assoc($alat_result)): ?>
+                            <option value="<?= $alat['id'] ?>" <?= ($action == 'edit' && $data_edit['id_alat'] == $alat['id']) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($alat['nama_alat']) ?> - <?= $alat['status'] ?>
+                            </option>
+                        <?php endwhile; ?>
+                    </select>
                 </div>
                 <div class="mb-3">
-                    <label>ID User</label>
-                    <input type="number" name="id_user" class="form-control" required value="<?= $action == 'edit' ? $data_edit['id_user'] : '' ?>">
+                    <label>Nama User</label>
+                    <select name="id_user" class="form-select" required>
+                        <option value="">-- Pilih User --</option>
+                        <?php while ($user = mysqli_fetch_assoc($user_result)): ?>
+                            <option value="<?= $user['id'] ?>" <?= ($action == 'edit' && $data_edit['id_user'] == $user['id']) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($user['nama']) ?>
+                            </option>
+                        <?php endwhile; ?>
+                    </select>
                 </div>
                 <div class="mb-3">
                     <label>Tanggal Sewa</label>
-                    <input type="date" name="tanggal_sewa" class="form-control" required value="<?= $action == 'edit' ? $data_edit['tanggal_sewa'] : '' ?>">
+                    <input type="date" name="tanggal_sewa" class="form-control" required
+                        value="<?= $action == 'edit' ? $data_edit['tanggal_sewa'] : '' ?>">
                 </div>
                 <div class="mb-3">
                     <label>Durasi (hari)</label>
-                    <input type="number" name="durasi" class="form-control" required value="<?= $action == 'edit' ? $data_edit['durasi'] : '' ?>">
+                    <input type="number" name="durasi" class="form-control" required
+                        value="<?= $action == 'edit' ? $data_edit['durasi'] : '' ?>">
                 </div>
                 <div class="mb-3">
                     <label>Total Biaya</label>
-                    <input type="number" name="total_biaya" class="form-control" required value="<?= $action == 'edit' ? $data_edit['total_biaya'] : '' ?>">
+                    <input type="number" name="total_biaya" class="form-control" required
+                        value="<?= $action == 'edit' ? $data_edit['total_biaya'] : '' ?>">
                 </div>
                 <div class="mb-3">
                     <label>Status</label>
@@ -162,24 +187,36 @@ $result = mysqli_query($conn, $query);
                                 <td><?= $no++ ?></td>
                                 <td><?= htmlspecialchars($row['nama_user']) ?></td>
                                 <td><?= htmlspecialchars($row['nama_alat']) ?></td>
-                                <td><?= htmlspecialchars($row['tanggal_sewa']) ?></td>
+                                <td><?= date('d-m-Y', strtotime($row['tanggal_sewa'])) ?></td>
                                 <td><?= $row['durasi'] ?></td>
                                 <td>Rp<?= number_format($row['total_biaya'], 0, ',', '.') ?></td>
                                 <td>
                                     <?php
                                     $status = $row['status'];
-                                    $badge = 'secondary';
-                                    if ($status == 'menunggu') $badge = 'warning';
-                                    elseif ($status == 'disetujui') $badge = 'success';
-                                    elseif ($status == 'ditolak') $badge = 'danger';
+                                    $badge = 'secondary'; // default
+                        
+                                    if ($status == 'menunggu') {
+                                        $badge = 'warning';
+                                    } elseif ($status == 'disetujui') {
+                                        $badge = 'info';
+                                    } elseif ($status == 'berjalan') {
+                                        $badge = 'primary';
+                                    } elseif ($status == 'selesai') {
+                                        $badge = 'success';
+                                    } elseif ($status == 'ditolak') {
+                                        $badge = 'danger';
+                                    }
                                     ?>
                                     <span class="badge bg-<?= $badge ?>"><?= ucfirst($status) ?></span>
                                 </td>
                                 <td>
                                     <a href="transaksi.php?action=edit&id=<?= $row['id'] ?>" class="btn btn-warning btn-sm">Edit</a>
-                                    <a href="transaksi.php?action=delete&id=<?= $row['id'] ?>" onclick="return confirm('Yakin hapus data?')" class="btn btn-danger btn-sm">Hapus</a>
+                                    <a href="transaksi.php?action=delete&id=<?= $row['id'] ?>"
+                                        onclick="return confirm('Yakin hapus data?')" class="btn btn-danger btn-sm">Hapus</a>
                                     <!-- Tambahkan tombol selesai -->
-                                    <a href="transaksi.php?action=selesai&id=<?= $row['id'] ?>" onclick="return confirm('Tandai transaksi ini sebagai selesai?')" class="btn btn-success btn-sm" title="Selesaikan">
+                                    <a href="transaksi.php?action=selesai&id=<?= $row['id'] ?>"
+                                        onclick="return confirm('Tandai transaksi ini sebagai selesai?')"
+                                        class="btn btn-success btn-sm" title="Selesaikan">
                                         <i class="bi bi-check-circle"></i> <!-- pastikan Anda menggunakan Bootstrap Icons -->
                                     </a>
                                 </td>

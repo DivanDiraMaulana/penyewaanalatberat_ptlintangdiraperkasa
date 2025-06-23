@@ -2,66 +2,33 @@
 session_start();
 include "../config/db.php";
 
-// Cek login admin (ubah sesuai kebutuhan)
 if (!isset($_SESSION['is_login']) || $_SESSION['role'] != 'admin') {
     header("Location: login.php");
     exit;
 }
 
-$action = $_GET['action'] ?? '';
+$start_date = $_GET['start_date'] ?? '';
+$end_date = $_GET['end_date'] ?? '';
+$search = $_GET['search'] ?? '';
 
-if ($action == 'add') {
-    // proses tambah data
-    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-        $id_alat = $_POST['id_alat'];
-        $id_user = $_POST['id_user'];
-        $tanggal_sewa = $_POST['tanggal_sewa'];
-        $durasi = $_POST['durasi'];
-        $total_biaya = $_POST['total_biaya'];
-        $status = $_POST['status'];
-
-        $query = "INSERT INTO transaksi (id_alat, id_user, tanggal_sewa, durasi, total_biaya, status)
-                  VALUES ('$id_alat', '$id_user', '$tanggal_sewa', '$durasi', '$total_biaya', '$status')";
-        mysqli_query($conn, $query);
-        header("Location: transaksi.php");
-        exit;
-    }
-    // tampilkan form tambah di bawah (HTML form)
-} elseif ($action == 'edit' && isset($_GET['id'])) {
-    // proses edit data
-    $id = $_GET['id'];
-    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-        $id_alat = $_POST['id_alat'];
-        $id_user = $_POST['id_user'];
-        $tanggal_sewa = $_POST['tanggal_sewa'];
-        $durasi = $_POST['durasi'];
-        $total_biaya = $_POST['total_biaya'];
-        $status = $_POST['status'];
-
-        $query = "UPDATE transaksi SET id_alat='$id_alat', id_user='$id_user', tanggal_sewa='$tanggal_sewa',
-                  durasi='$durasi', total_biaya='$total_biaya', status='$status' WHERE id='$id'";
-        mysqli_query($conn, $query);
-        header("Location: transaksi.php");
-        exit;
-    }
-    // ambil data transaksi untuk form edit
-    $result = mysqli_query($conn, "SELECT * FROM transaksi WHERE id='$id'");
-    $data_edit = mysqli_fetch_assoc($result);
-} elseif ($action == 'delete' && isset($_GET['id'])) {
-    // proses hapus data
-    $id = $_GET['id'];
-    mysqli_query($conn, "DELETE FROM transaksi WHERE id='$id'");
-    header("Location: transaksi.php");
-    exit;
-}
-
-// Ambil semua data transaksi untuk ditampilkan di tabel
-$query = "SELECT t.*, a.nama_alat, u.nama AS nama_user 
+$query = "SELECT t.*, a.nama_alat, u.email, u.nama AS nama_user 
           FROM transaksi t 
           JOIN alat_berat a ON t.id_alat = a.id 
           JOIN users u ON t.id_user = u.id 
-          WHERE t.status = 'selesai'
-          ORDER BY t.id DESC";
+          WHERE t.status = 'selesai'";
+
+// Filter tanggal
+if (!empty($start_date) && !empty($end_date)) {
+    $query .= " AND t.tanggal_sewa BETWEEN '$start_date' AND '$end_date'";
+}
+
+// Filter pencarian nama alat
+if (!empty($search)) {
+    $query .= " AND a.nama_alat LIKE '%$search%'";
+}
+
+$query .= " ORDER BY t.id DESC";
+
 $result = mysqli_query($conn, $query);
 ?>
 
@@ -70,101 +37,138 @@ $result = mysqli_query($conn, $query);
 
 <head>
     <meta charset="UTF-8">
-    <title>Panel Admin - Transaksi</title>
+    <title>Data Transaksi</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+
+            .print-range {
+                display: block !important;
+                margin-bottom: 10px;
+            }
+        }
+
+        .print-range {
+            display: none;
+        }
+
+        body {
+            margin: 0;
+        }
+
+        .sidebar {
+            width: 250px;
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+        }
+    </style>
 </head>
 
 <body>
 
-    <?php
-    include "sidebar_admin.php";
-    ?>
-    <div class="container mt-4">
-        <h3>Data Transaksi</h3>
-        <?php if ($action == 'add' || ($action == 'edit' && isset($data_edit))): ?>
-            <h5><?= $action == 'add' ? 'Tambah Transaksi' : 'Edit Transaksi' ?></h5>
-            <form method="POST" action="">
-                <div class="mb-3">
-                    <label>ID Alat Berat</label>
-                    <input type="number" name="id_alat" class="form-control" required value="<?= $action == 'edit' ? $data_edit['id_alat'] : '' ?>">
-                </div>
-                <div class="mb-3">
-                    <label>ID User</label>
-                    <input type="number" name="id_user" class="form-control" required value="<?= $action == 'edit' ? $data_edit['id_user'] : '' ?>">
-                </div>
-                <div class="mb-3">
-                    <label>Tanggal Sewa</label>
-                    <input type="date" name="tanggal_sewa" class="form-control" required value="<?= $action == 'edit' ? $data_edit['tanggal_sewa'] : '' ?>">
-                </div>
-                <div class="mb-3">
-                    <label>Durasi (hari)</label>
-                    <input type="number" name="durasi" class="form-control" required value="<?= $action == 'edit' ? $data_edit['durasi'] : '' ?>">
-                </div>
-                <div class="mb-3">
-                    <label>Total Biaya</label>
-                    <input type="number" name="total_biaya" class="form-control" required value="<?= $action == 'edit' ? $data_edit['total_biaya'] : '' ?>">
-                </div>
-                <div class="mb-3">
-                    <label>Status</label>
-                    <select name="status" class="form-select" required>
-                        <option value="menunggu" <?= ($action == 'edit' && $data_edit['status'] == 'menunggu') ? 'selected' : '' ?>>Menunggu</option>
-                        <option value="disetujui" <?= ($action == 'edit' && $data_edit['status'] == 'disetujui') ? 'selected' : '' ?>>Disetujui</option>
-                        <option value="ditolak" <?= ($action == 'edit' && $data_edit['status'] == 'ditolak') ? 'selected' : '' ?>>Ditolak</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-primary"><?= $action == 'add' ? 'Tambah' : 'Update' ?></button>
-                <a href="transaksi.php" class="btn btn-secondary">Batal</a>
-            </form>
-        <?php else: ?>
-            <a href="transaksi.php?action=add" class="btn btn-success mb-3">Tambah Transaksi</a>
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Penyewa</th>
-                        <th>Alat Berat</th>
-                        <th>Tgl Sewa</th>
-                        <th>Durasi (hari)</th>
-                        <th>Total Biaya</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (mysqli_num_rows($result) > 0): ?>
-                        <?php $no = 1;
-                        while ($row = mysqli_fetch_assoc($result)): ?>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div class="sidebar no-print">
+            <?php include "sidebar_admin.php"; ?>
+        </div>
+
+        <!-- Konten Utama -->
+        <div class="main-content">
+            <div class="container-fluid">
+                <h3>Riwayat Transaksi</h3>
+
+                <!-- Form Filter dan Pencarian -->
+                <form method="GET" class="row g-3 mb-3 no-print">
+                    <div class="col-md-3">
+                        <label for="start_date" class="form-label">Dari Tanggal</label>
+                        <input type="date" class="form-control" name="start_date" id="start_date"
+                            value="<?= htmlspecialchars($start_date) ?>">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="end_date" class="form-label">Sampai Tanggal</label>
+                        <input type="date" class="form-control" name="end_date" id="end_date"
+                            value="<?= htmlspecialchars($end_date) ?>">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="search" class="form-label">Cari Nama Alat</label>
+                        <input type="text" class="form-control" name="search" placeholder="Misal: Excavator"
+                            value="<?= htmlspecialchars($search) ?>">
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary me-2">Terapkan</button>
+                        <button type="button" onclick="window.print()" class="btn btn-success">Print</button>
+                    </div>
+                </form>
+
+                <!-- Keterangan Rentang Tanggal Saat Print -->
+                <?php if (!empty($start_date) && !empty($end_date)): ?>
+                    <div class="print-range">
+                        <p><strong>Transaksi dari tanggal <?= date('d-m-Y', strtotime($start_date)) ?> sampai
+                                <?= date('d-m-Y', strtotime($end_date)) ?></strong></p>
+                    </div>
+                <?php endif; ?>
+
+                <!-- Tabel Data -->
+                <div class="table-responsive w-">
+                    <table class="table table-bordered">
+                        <thead class="table-light text-center">
                             <tr>
-                                <td><?= $no++ ?></td>
-                                <td><?= htmlspecialchars($row['nama_user']) ?></td>
-                                <td><?= htmlspecialchars($row['nama_alat']) ?></td>
-                                <td><?= htmlspecialchars($row['tanggal_sewa']) ?></td>
-                                <td><?= $row['durasi'] ?></td>
-                                <td>Rp<?= number_format($row['total_biaya'], 0, ',', '.') ?></td>
-                                <td>
-                                    <?php
-                                    $status = $row['status'];
-                                    $badge = 'secondary';
-                                    if ($status == 'menunggu') $badge = 'warning';
-                                    elseif ($status == 'disetujui') $badge = 'success';
-                                    elseif ($status == 'ditolak') $badge = 'danger';
-                                    ?>
-                                    <span class="badge bg-<?= $badge ?>"><?= ucfirst($status) ?></span>
-                                </td>
-                                <td>
-                                    <a href="transaksi.php?action=edit&id=<?= $row['id'] ?>" class="btn btn-warning btn-sm">Edit</a>
-                                    <a href="transaksi.php?action=delete&id=<?= $row['id'] ?>" onclick="return confirm('Yakin hapus data?')" class="btn btn-danger btn-sm">Hapus</a>
-                                </td>
+                                <th>No</th>
+                                <th>Penyewa</th>
+                                <th>Email</th>
+                                <th>Alat Berat</th>
+                                <th>Tgl Sewa</th>
+                                <th>Durasi (hari)</th>
+                                <th>Total Biaya</th>
+                                <th>Status</th>
                             </tr>
-                        <?php endwhile; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="8" class="text-center">Belum ada data transaksi.</td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        <?php endif; ?>
+                        </thead>
+                        <tbody>
+                            <?php if (mysqli_num_rows($result) > 0): ?>
+                                <?php $no = 1;
+                                while ($row = mysqli_fetch_assoc($result)): ?>
+                                    <tr>
+                                        <td class="text-center"><?= $no++ ?></td>
+                                        <td><?= htmlspecialchars($row['nama_user']) ?></td>
+                                        <td><?= htmlspecialchars($row['email']) ?></td>
+                                        <td><?= htmlspecialchars($row['nama_alat']) ?></td>
+                                        <td><?= date('d-m-Y', strtotime($row['tanggal_sewa'])) ?></td>
+                                        <td class="text-center"><?= $row['durasi'] ?></td>
+                                        <td>Rp<?= number_format($row['total_biaya'], 0, ',', '.') ?></td>
+                                        <td class="text-center">
+                                            <?php
+                                            $status = $row['status'];
+                                            $badge = match ($status) {
+                                                'menunggu' => 'warning',
+                                                'disetujui' => 'info',
+                                                'berjalan' => 'primary',
+                                                'selesai' => 'success',
+                                                'ditolak' => 'danger',
+                                                default => 'secondary'
+                                            };
+                                            ?>
+                                            <span class="badge bg-<?= $badge ?>"><?= ucfirst($status) ?></span>
+                                        </td>
+                                    </tr>
+                                <?php endwhile; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted">Tidak ada data ditemukan.</td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

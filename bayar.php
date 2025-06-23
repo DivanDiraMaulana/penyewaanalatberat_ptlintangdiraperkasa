@@ -30,11 +30,17 @@ if (!isset($_SESSION['is_login'])) {
 
     <?php
     include "partials/sidebar.php"
-    ?>
+        ?>
 
     <!-- Main Content -->
     <div class="content mt-5">
-        <h1>Bayar kesini ya</h1>
+        <h1>PEMBAYARAN</h1>
+        <H2>Bayar ke Nomor Rekening dibawah ini</H2>
+        <p> </p>
+        <p>BCA 211011400975 an Muhammad Lintang Fahreza</p>
+        <p>BSI 211011401032 an Divan Dira Maulana</p>
+        <p>Kirim Bukti Pembayaran ke Nomor WhatsApp berikut 082110111030400975</p>
+        <p>Cek Status setelah bayar akan menjadi berjalan</p>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
