@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               <input type="email" class="form-control" name="email" value="<?= htmlspecialchars($user['email']); ?>" required>
             </div>
             <button type="submit" class="btn btn-success btn-sm w-100">Simpan</button>
-            <a href="profile.php" class="btn btn-secondary btn-sm w-100 mt-2">Batal</a>
+            <a href="profil.php" class="btn btn-secondary btn-sm w-100 mt-2">Batal</a>
           </form>
         <?php else: ?>
           <h4 class="card-title mb-3"><i class="bi bi-person-fill text-primary"></i> <?= htmlspecialchars($user['nama']); ?></h4>
